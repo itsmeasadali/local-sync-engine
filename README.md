@@ -1,6 +1,5 @@
 # Local Sync Engine
 
-[![CI](https://github.com/itsmeasadali/local-sync-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/itsmeasadali/local-sync-engine/actions/workflows/ci.yml)
 [![MSRV](https://img.shields.io/badge/rustc-1.88%2B-blue.svg)](https://www.rust-lang.org)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
@@ -26,13 +25,15 @@ Choose a different system when you need peer-to-peer sync, collaborative rich-te
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A[Application] --> B[SyncDatabase]
-    B -->|local transaction| C[(SQLite)]
-    C -->|durable outbox| B
-    B <-->|push / pull over HTTP v1| D[Axum sync server]
-    D --> E[(PostgreSQL operation log)]
+```text
+Application
+    |
+    v
+SyncDatabase <---- local transaction ----> SQLite + durable outbox
+    |
+    | HTTP v1 push / pull
+    v
+Axum sync server ------------------------> PostgreSQL operation log
 ```
 
 The client owns the offline experience: local mutations and their outbox entries commit atomically. The server authenticates actors, assigns gap-free workspace sequence numbers, and stores immutable operations. Every client pulls from its durable cursor and applies the same deterministic merge rules, so retries are safe and replicas converge.
