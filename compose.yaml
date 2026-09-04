@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: sync
+      POSTGRES_USER: sync
+      POSTGRES_PASSWORD: development-only
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sync"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+  server:
+    build: .
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      SYNC_DATABASE_URL: postgres://sync:development-only@postgres/sync
+      SYNC_LISTEN_ADDR: 0.0.0.0:8080
+      SYNC_BOOTSTRAP_WORKSPACE: demo
+      SYNC_BOOTSTRAP_ACTOR: alice
+      SYNC_BOOTSTRAP_TOKEN: 00000000-0000-0000-0000-000000000001.local-development-secret
+      RUST_LOG: sync_server=info,tower_http=info
+    ports: ["8080:8080"]
+volumes:
+  postgres-data:

@@ -1,0 +1,24 @@
+[package]
+name = "syncctl"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Command-line client for Local Sync Engine"
+readme = "../../README.md"
+repository.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+serde_json.workspace = true
+sync-client = { path = "../sync-client", version = "0.1.0" }
+sync-protocol = { path = "../sync-protocol", version = "0.1.0" }
+tokio.workspace = true
+uuid.workspace = true
+
+[lints]
+workspace = true

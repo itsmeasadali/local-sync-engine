@@ -1,0 +1,131 @@
+openapi: 3.1.0
+info:
+  title: Local Sync API
+  version: 1.0.0
+paths:
+  /v1/sync/push:
+    post:
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PushRequest' }
+      responses:
+        '200':
+          description: One result per submitted mutation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PushResponse' }
+        '400':
+          description: Invalid batch
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+        '401':
+          description: Invalid or expired credential
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+        '413':
+          description: Request body too large
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+  /v1/sync/pull:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: after, in: query, schema: { type: integer, format: int64, minimum: 0 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200':
+          description: Ordered mutation page
+          content: { application/json: { schema: { $ref: '#/components/schemas/PullResponse' } } }
+        '400':
+          description: Invalid cursor or limit
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+        '401':
+          description: Invalid or expired credential
+          content: { application/json: { schema: { $ref: '#/components/schemas/ApiError' } } }
+  /health/live:
+    get: { responses: { '200': { description: Process is live } } }
+  /health/ready:
+    get: { responses: { '200': { description: Database is reachable }, '503': { description: Not ready } } }
+  /metrics:
+    get: { responses: { '200': { description: Prometheus/OpenMetrics text } } }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  schemas:
+    PushRequest:
+      type: object
+      required: [mutations]
+      properties:
+        mutations:
+          type: array
+          items: { $ref: '#/components/schemas/Mutation' }
+    Mutation:
+      type: object
+      required: [mutation_id, workspace_id, actor_id, collection, record_id, version]
+      properties:
+        mutation_id: { type: string, format: uuid }
+        workspace_id: { type: string, minLength: 1, maxLength: 255 }
+        actor_id: { type: string, minLength: 1, maxLength: 255 }
+        collection: { type: string, minLength: 1, maxLength: 255 }
+        record_id: { type: string, minLength: 1, maxLength: 255 }
+        fields:
+          type: object
+          additionalProperties: { $ref: '#/components/schemas/FieldChange' }
+        delete: { type: boolean, default: false }
+        version:
+          type: object
+          required: [timestamp, actor_id]
+          properties:
+            timestamp:
+              type: object
+              required: [physical_ms, logical]
+              properties:
+                physical_ms: { type: integer, format: int64, minimum: 0 }
+                logical: { type: integer, minimum: 0, maximum: 4294967295 }
+            actor_id: { type: string }
+    FieldChange:
+      type: object
+      required: [value]
+      properties:
+        value: true
+    PushResponse:
+      type: object
+      required: [results]
+      properties:
+        results:
+          type: array
+          items: { $ref: '#/components/schemas/PushResult' }
+    PushResult:
+      type: object
+      required: [mutation_id, status, sequence, error]
+      properties:
+        mutation_id: { type: string, format: uuid }
+        status: { type: string, enum: [accepted, already_accepted, rejected] }
+        sequence: { type: [integer, 'null'], format: int64, minimum: 1 }
+        error:
+          oneOf:
+            - { $ref: '#/components/schemas/ApiError' }
+            - { type: 'null' }
+    PullResponse:
+      type: object
+      required: [mutations, cursor, has_more]
+      properties:
+        mutations:
+          type: array
+          items:
+            type: object
+            required: [sequence, mutation]
+            properties:
+              sequence: { type: integer, format: int64, minimum: 1 }
+              mutation: { $ref: '#/components/schemas/Mutation' }
+        cursor: { type: integer, format: int64, minimum: 0 }
+        has_more: { type: boolean }
+    ApiError:
+      type: object
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+          enum: [unauthorized, credential_expired, credential_revoked, workspace_mismatch, actor_mismatch, invalid_mutation, future_clock, batch_too_large, invalid_cursor, invalid_limit, request_too_large, internal, unavailable, unknown]
+        message: { type: string }
+        request_id: { type: [string, 'null'] }

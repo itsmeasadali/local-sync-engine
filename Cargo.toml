@@ -1,0 +1,50 @@
+[workspace]
+members = [
+  "crates/sync-protocol",
+  "crates/sync-core",
+  "crates/sync-client",
+  "crates/sync-server",
+  "crates/syncctl",
+  "examples/todo",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+rust-version = "1.88"
+repository = "https://github.com/itsmeasadali/local-sync-engine"
+homepage = "https://github.com/itsmeasadali/local-sync-engine"
+keywords = ["offline-first", "local-first", "synchronization", "sqlite", "distributed"]
+categories = ["database", "network-programming", "asynchronous"]
+
+[workspace.dependencies]
+anyhow = "1.0.95"
+argon2 = "0.5.3"
+async-trait = "0.1.85"
+axum = "0.8.1"
+clap = { version = "4.5.27", features = ["derive", "env"] }
+hex = "0.4.3"
+proptest = "1.6.0"
+prometheus-client = "0.23.1"
+rand = "0.8.5"
+reqwest = { version = "0.12.12", default-features = false, features = ["json", "rustls-tls"] }
+rusqlite = { version = "0.32.1", features = ["bundled"] }
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.137"
+sqlx = { version = "0.8.3", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json", "migrate", "macros"] }
+thiserror = "2.0.11"
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread", "signal", "time", "net", "sync"] }
+tower = { version = "0.5.2", features = ["util"] }
+tower-http = { version = "0.6.2", features = ["limit", "request-id", "timeout", "trace"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "json"] }
+uuid = { version = "1.12.1", features = ["v4", "serde"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = "deny"
+pedantic = "warn"

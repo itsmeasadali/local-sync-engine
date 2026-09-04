@@ -1,0 +1,19 @@
+name: Bug report
+description: Report incorrect synchronization or operational behavior
+body:
+  - type: textarea
+    id: behavior
+    attributes: { label: Observed behavior, description: Do not include credentials or private record contents. }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Expected behavior }
+    validations: { required: true }
+  - type: textarea
+    id: reproduction
+    attributes: { label: Minimal reproduction }
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes: { label: Version or commit }
+    validations: { required: true }

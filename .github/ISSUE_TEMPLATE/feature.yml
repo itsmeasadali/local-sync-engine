@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose a focused improvement to Local Sync Engine
+body:
+  - type: markdown
+    attributes:
+      value: Protocol and merge-semantic changes should explain their compatibility impact.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What limitation or use case should the project address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior and API you would expect.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Which workarounds or other designs have you considered?
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility impact
+      description: Note any protocol, storage, deployment, or migration implications.

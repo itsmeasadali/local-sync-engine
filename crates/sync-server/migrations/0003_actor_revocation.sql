@@ -1,0 +1,2 @@
+ALTER TABLE actors
+    ADD COLUMN revoked_at TIMESTAMPTZ;
