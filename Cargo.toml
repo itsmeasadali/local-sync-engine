@@ -21,7 +21,7 @@ categories = ["database", "network-programming", "asynchronous"]
 
 [workspace.dependencies]
 anyhow = "1.0.95"
-argon2 = "0.5.3"
+argon2 = "0.6.0"
 async-trait = "0.1.85"
 axum = "0.8.1"
 clap = { version = "4.5.27", features = ["derive", "env"] }
